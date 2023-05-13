@@ -1,0 +1,89 @@
+.project-head{
+    width: 70%;
+    margin: 5% auto;
+    max-height: 900px;
+    height: 50vh;
+    display: flex;
+    flex-direction: row;
+    .left{
+        flex: 3;
+        display: flex;
+        justify-content: end;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.191);
+        border-radius: 6px;
+        margin-right: 30px;
+        .wrapper{
+            border-radius: 6px;
+        }
+    }
+    .right{
+        flex: 2;
+        height: 100%;
+        .card{
+            height: 100%;
+            //give it a nice small shadow
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.191);
+            border-radius: 6px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .card-header{
+                text-align: left;
+                font-size: 1.7rem;
+                margin-bottom: 3px;
+            }
+            .backers{
+                h1 {
+                    font-size: 2rem;
+                }
+                margin-top: 10px;
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            .card-title{
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+            }
+            .card-body{
+                display: flex;
+                flex-direction: column;
+                justify-content: start;
+;
+            }
+            .card-input{
+                width: 80%;
+                margin-bottom: 1rem;
+            }
+            .card-button{
+                width: 80%;
+                margin-bottom: 1rem;
+            }
+            .actions{
+                .action-row{
+                    padding-top: 12px;
+                    button{
+                        margin: 0!important;
+                    }
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                padding-top: 30px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                width: 100%;
+                button{
+                    margin-top: 12px;
+                }
+            }
+        }
+    }
+}
+.project-body{
+    width: 70%;
+    margin: 5% auto;
+}

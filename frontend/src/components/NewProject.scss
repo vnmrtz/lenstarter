@@ -1,0 +1,14 @@
+.newproject-wrapper{
+    max-height: 900px;
+    height: 70vh;
+    display: flex;
+    flex-direction: row;
+    .left{
+        flex: 3;
+        display: flex;
+        justify-content: end;
+    }
+    .right{
+        flex: 2;
+    }
+}
