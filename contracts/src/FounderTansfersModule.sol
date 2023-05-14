@@ -62,8 +62,9 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
         manager = _manager;
     }
 
-    function startFounderSeason(address safe, uint256 _objectiveAmount, uint256 _timeUnlockBySafe) public onlyManager {
+    function startFounderSeason(address safe, uint256 _objectiveAmount, uint256 _timeUnlockBySafe) public {
         require(!activeFounderSeasonBySafe[safe], "Founder season is already active");
+        require(safe == msg.sender, "Sender is not an owner of the safe" );
         require(_objectiveAmount > 0, "Objective amount must be greater than 0");
         require(_timeUnlockBySafe > 3 days, "Time to achive objective amount must be greater than 0");
         
