@@ -13,6 +13,8 @@ contract DeployModuleAndGuardian is Script {
         vm.startBroadcast(deployPrivateKey);
         FounderTansfersModule founderTansfersModule = new FounderTansfersModule(address(vm));
         console.log("FounderTansfersModule address: %s", address(founderTansfersModule));
+        LensActionGuard lensActionGuard = new LensActionGuard();
+        console.log("LensActionGuard address: %s", address(lensActionGuard));
         vm.broadcast();
     }
 }
