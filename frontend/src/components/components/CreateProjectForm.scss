@@ -1,6 +1,20 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400italic,700,600,800,500,400|Roboto:700");
 
 .create-form {
+  .copyright{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    padding-bottom: 17px;
+  }
+  position:relative;
+  .Mui-active {
+    color: #3c82f6!important;
+  }
+  .MuiButton-containedPrimary{
+    background-color: #3c82f6;
+  }
   height: 100%;
   .screen a {
     display: contents;

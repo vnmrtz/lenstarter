@@ -2,6 +2,7 @@ import React from "react";
 import CreateProjectForm from "./components/CreateProjectForm";
 import hand from "../assets/hand.png";
 import "./NewProject.scss";
+import VerticalLinearStepper from "./components/CreateProjectForm";
 
 export default function NewProject() {
     return (
@@ -10,7 +11,7 @@ export default function NewProject() {
                 <img src={hand}></img>
             </div>
             <div className="right">
-                <CreateProjectForm/>
+                <VerticalLinearStepper/>
             </div>
         </div>
     )
