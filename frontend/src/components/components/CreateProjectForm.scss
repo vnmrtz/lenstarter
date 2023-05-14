@@ -2,11 +2,15 @@
 
 .create-form {
   .copyright{
+    margin-top: -20px;
     position: absolute;
     bottom: 0;
     right: 0;
     left: 0;
     padding-bottom: 17px;
+  }
+  .error{
+    margin-top: -20px;
   }
   position:relative;
   .Mui-active {

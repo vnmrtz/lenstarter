@@ -15,10 +15,20 @@ import { SafeFactory } from '@safe-global/protocol-kit'
 import { EthersAdapter } from '@safe-global/protocol-kit'
 import { SafeAccountConfig } from '@safe-global/protocol-kit'
 
+const LENS_HUB_ADDRESS = "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
+
+//erc721 abi
+const LENS_HUB_ABI = [
+  "transferFrom(address,address,uint256)",
+  "balanceOf(address)"
+];
+
+
 
 
 
 export default function VerticalLinearStepper() {
+  const [safe, setSafe] = useState(null)
 
   const steps = [
     {
@@ -26,12 +36,12 @@ export default function VerticalLinearStepper() {
       description: <CreateProjectForm />,
     },
     {
-      label: 'Create an ad group',
+      label: 'Fund wallet',
       description:
-        'An ad group contains one or more ads which target a shared set of keywords.',
+        'Send tokens to your abstract wallet to cover future transaction fees.',
     },
     {
-      label: 'Create an ad',
+      label: 'Deposit YOUR .lens handle',
       description: `Try out different ad text to see what brings in the most customers,
                 and learn how to enhance your ads using features like ad extensions.
                 If you run into any problems with your ads, find out how to tell if
@@ -60,11 +70,28 @@ export default function VerticalLinearStepper() {
   }
 
   async function handleTransfer() {
-    return false
+    const { provider, signer, ethAdapter } = setUpEthers();
+    try {
+      signer.sendTransaction({
+        to: safe,
+        value: ethers.utils.parseEther("0.5")
+      })
+      return true;
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async function handleApprove() {
-    return false
+    const { provider, signer, ethAdapter } = setUpEthers();
+    try {
+      const lensHub = new ethers.Contract(LENS_HUB_ADDRESS, LENS_HUB_ABI, provider)
+      const tx = await lensHub.transferFrom(account.address, safe, 1)
+      await tx.wait()
+      return true;
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async function handleWalletCreation(event) {
@@ -97,9 +124,17 @@ export default function VerticalLinearStepper() {
       threshold: 1,
       // ... (Optional params)
     }
-    console.log(account.address)
-    const safe = await safeFactory.deploySafe({safeAccountConfig});
+    try{
+      const safe = await safeFactory.deploySafe({safeAccountConfig});
+      setSafe(safe.address)
+      next();
+    }
+    catch(e){
+      console.log(e)
+    }    
   }
+
+
 
 
   function CreateProjectForm(props) {
@@ -131,7 +166,7 @@ export default function VerticalLinearStepper() {
               </label>
               <textarea class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="description" type="text" placeholder="Stealing money from north korea" />
             </div>
-            {error && <p class="text-red-500 text-xs italic">{error}</p>}
+            {error && <p class="error text-red-500 text-xs italic">{error}</p>}
           </form>
         </div>
       </div>
