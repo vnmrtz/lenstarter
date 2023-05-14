@@ -1,0 +1,78 @@
+.landing-bottom{
+    height: 90vh;   
+}
+.landing{
+    height: 90vh;
+    margin: 5% 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .landing-bottom-stats{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+    }
+    .landing-top-section{
+        display: flex;
+        width: 80%;
+        flex: 1;
+        .search-input{
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.217);
+            border-radius: 6px;
+        }
+
+        .landing-top-titles{
+            justify-content: center;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            h1{
+                font-size: 3.5rem;
+                font-weight: 500;
+                margin-bottom: 1rem;
+            }
+        }
+        .block{
+            flex-direction: column;
+            flex: 2;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            .search{
+                justify-self: end;
+                align-content: baseline;
+            }
+        }
+        .right{
+            flex: 1;
+            justify-content: center;
+            width: 100%;
+        }
+    }
+    .landing-bottom-section{
+        .landing-bottom-stats{
+            width: 80%;
+            height: 60%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        width: 100%;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+.navbar{
+    //make a little shadow in the bottom for a navbar
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    a{
+        margin: auto 0;
+    }
+}
+
+
