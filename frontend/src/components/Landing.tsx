@@ -52,15 +52,55 @@ export default function Landing() {
 
     const projects = [
         {
-            title: "Project 1",            
-            owner: "0x408BcC04d5234699dE68852fe377d36e3ebF59bd",
-            imageURL: "https://images.unsplash.com/photo-1683844399879-0122f0dffda6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+            title: "pepe.lens",            
+            owner: "0x583e367ABd6600f65142dEa4E34B6A7363310829",
+            imageURL: "https://i3.wp.com/static.news.bitcoin.com/wp-content/uploads/2023/04/pepes.jpg?ssl=1",
+            id : 1,
+            expiresAt: "2023-10-15T00:00:00.000Z",
+            raised: 500,
+            cost: 1000,
+            backing: 100
+        },
+        {
+            title: "rafatatay.lens",            
+            owner: "0x583e367ABd6600f65142dEa4E34B6A7363310829",
+            imageURL: "https://comunica2.webs.upv.es/wp-content/uploads/2021/09/RafaTatay-1.jpeg",
             id : 1,
             expiresAt: "2021-10-15T00:00:00.000Z",
             raised: 0,
             cost: 100,
             backing: 0
-        }
+        },{
+            title: "stani.lens",            
+            owner: "0xd75479f1AC78639249C92E811EEc42d985342516",
+            imageURL: "https://pbs.twimg.com/profile_images/1621437030403014656/hrFnFkBw_400x400.jpg",
+            id : 1,
+            expiresAt: "2024-10-15T00:00:00.000Z",
+            raised: 345,
+            cost: 999,
+            backing: 0
+        },
+        {
+            title: "spiderman.lens",            
+            owner: "0xe491127255c049efD0028E9E557A94A49c4c5B24",
+            imageURL: "https://images.unsplash.com/photo-1683844399879-0122f0dffda6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+            id : 1,
+            expiresAt: "2021-10-15T00:00:00.000Z",
+            raised: 100,
+            cost: 100,
+            backing: 0
+        },
+        {
+            title: "cobie.lens",            
+            owner: "0x72cBcd927B93Ad6d8c57A8eD2e4f449E6ca0eca5",
+            imageURL: "https://images.unsplash.com/photo-1683844399879-0122f0dffda6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+            id : 1,
+            expiresAt: "2021-10-15T00:00:00.000Z",
+            raised: 100,
+            cost: 100,
+            backing: 0
+        },
+
     ]
 
     return (
@@ -72,7 +112,7 @@ export default function Landing() {
                             <h1>Use your Lens handle <br />
                                 Kickstart your career
                             </h1>
-                            <p>Support creators with a credit line . Share their future revnue</p>
+                            <p>Support creators with a credit line . Share their future revenue</p>
                         </div>
                         <div className="search">
                             <Search>
@@ -87,7 +127,7 @@ export default function Landing() {
                         </div>
                     </div>
                     <div className="block right">
-                        <source src="./assets/landing.mp4" type="video/mp4" />
+                        <img src="https://files.readme.io/c2459de-illustration_grow.svg" />
                     </div>
                 </div>
                 <div className="landing-bottom-section">
