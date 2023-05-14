@@ -164,7 +164,7 @@ export default function VerticalLinearStepper() {
               <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
                 What's your project about?
               </label>
-              <textarea class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="description" type="text" placeholder="Stealing money from north korea" />
+              <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="description" type="text" placeholder="Funding for a video" />
             </div>
             {error && <p class="error text-red-500 text-xs italic">{error}</p>}
           </form>
