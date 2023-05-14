@@ -5,6 +5,7 @@ import "../lib/safe-contracts/contracts/base/OwnerManager.sol";
 import {SecuredTokenTransfer} from "../lib/safe-contracts/contracts/common/SecuredTokenTransfer.sol";
 import "../lib/safe-contracts/contracts/common/SignatureDecoder.sol";
 import {Enum} from "../lib/safe-contracts/contracts/common/Enum.sol";
+import "../lib/safe-contracts/contracts/Safe.sol";
 interface GnosisSafe {
     /// @dev Allows a Module to execute a Safe transaction without any further confirmations.
     /// @param to Destination address of module transaction.
@@ -15,6 +16,17 @@ interface GnosisSafe {
         external
         returns (bool success);
 }
+interface IPool{
+    function withdraw(address asset, uint256 amount, address to) external returns (uint256);
+    function getUserAccountData(address user) external view returns (
+      uint256 totalCollateralBase,
+      uint256 totalDebtBase,
+      uint256 availableBorrowsBase,
+      uint256 currentLiquidationThreshold,
+      uint256 ltv,
+      uint256 healthFactor
+    );
+}
 
 
 contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager, SecuredTokenTransfer {
@@ -23,22 +35,24 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
     address public manager;
     address public usdc = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
     address public aavePool = 0x794a61358D6845594F94dc1DB02A252b5b4814aD;
+    address public aavePool2 = 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2;
 
-    bool public activeFounderSeason;
+    //Safe -> Founder -> Amount
+    mapping(address => mapping(address => uint256)) public founderDepositsbySafe;
+    //Safe -> bool
+    mapping(address => bool) public activeFounderSeasonBySafe;
+    //Safe -> AmountObjetive
+    mapping(address => uint256) public objectiveAmountBySafe;
+    //Safe -> TimeToAchiveObjetiveAmount
+    mapping(address => uint256) public timeUnlockBySafe;
+    //Safe -> TotalDeposited
+    mapping(address => uint256) public totalDepositedBySafe;
+    //Safe -> bool
+    mapping(address => bool) public founderHasWithdrawnBySafe;
 
-    uint256 public objectiveAmount;
-    uint256 public timeToAchiveObjetiveAmount;
-    uint256 public totalFounders;
-    uint256 public totalDeposited;
-
-    mapping(address => uint256) public founderDeposit;
-
-    address[] public founders;
-
-    event FounserSeasonStarted(uint256 objectiveAmount, uint256 timeToAchiveObjetiveAmount);
-    event FounserSeasonStopped();
-    event MoneyReturnedToFounder(address founder, uint256 amount);
-    event FounderHasDeposit(address founder, uint256 amount);
+    event FounserSeasonStarted(address indexed safe, uint256 indexed objectiveAmount, uint256 indexed timeToAchiveObjetiveAmount);
+    event MoneyReturnedToFounder(address indexed safe, address indexed founder, uint256 indexed amount);
+    event FounderHasDeposit(address indexed safe, address indexed founder, uint256 indexed amount);
     
     modifier onlyManager() {
         require(msg.sender == manager, "Only the manager can call this function.");
@@ -49,87 +63,71 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
         manager = _manager;
     }
 
-    function startFounderSeason(uint256 _objectiveAmount, uint256 _timeToAchiveObjetiveAmount) public onlyManager {
-        require(!activeFounderSeason, "Founder season is already active");
+    function startFounderSeason(address safe, uint256 _objectiveAmount, uint256 _timeUnlockBySafe) public onlyManager {
+        require(!activeFounderSeasonBySafe[safe], "Founder season is already active");
         require(_objectiveAmount > 0, "Objective amount must be greater than 0");
-        require(_timeToAchiveObjetiveAmount > 3 days, "Time to achive objective amount must be greater than 0");
+        require(_timeUnlockBySafe > 3 days, "Time to achive objective amount must be greater than 0");
         
-        activeFounderSeason = true;
-        objectiveAmount = _objectiveAmount;
-        timeToAchiveObjetiveAmount = _timeToAchiveObjetiveAmount;
+        activeFounderSeasonBySafe[safe] = true;
+        objectiveAmountBySafe[safe] = _objectiveAmount;
+        timeUnlockBySafe[safe] = _timeUnlockBySafe;
         
-        emit FounserSeasonStarted(_objectiveAmount, _timeToAchiveObjetiveAmount);
+        emit FounserSeasonStarted(safe, _objectiveAmount, _timeUnlockBySafe);
     }
 
-    
-    function stopFounderSeason() public onlyManager {
-        require(activeFounderSeason, "Founder season is not active");
-
-        activeFounderSeason = false;
-        returnMoneyToFounder();
-
-        emit FounserSeasonStopped();
-    }
-
-    function crowfundX(uint256 _amount) public{ //@todo with USDC
-        require(activeFounderSeason, "Founder season is not active");
+    function crowfundX(address safe, uint256 _amount) public{ //@todo with USDC
+        require(activeFounderSeasonBySafe[safe], "Founder season is not active");
         require(_amount > 0, "Amount must be greater than 0");
-        require(totalDeposited + _amount < objectiveAmount, "Amount must be less than objective amount");
+        require(totalDepositedBySafe[safe] + _amount < objectiveAmountBySafe[safe], "Amount must be less than objective amount");
 
         SecuredTokenTransfer.transferToken(usdc, msg.sender, _amount);
 
-        if(founderDeposit[msg.sender] == 0){
-            founders.push(msg.sender);
-        }
+        founderDepositsbySafe[safe][msg.sender] += _amount;
+        totalDepositedBySafe[safe] += _amount;
 
-        founderDeposit[msg.sender] += _amount;
-        totalDeposited += _amount;
-        
-        ++totalFounders;
-
-        emit FounderHasDeposit(msg.sender, _amount);
+        emit FounderHasDeposit(safe, msg.sender, _amount);
 
     }
 
-    function returnMoneyToFounder() internal {
-        for (uint i = 0; i < founders.length; i++) {
-            address founder = founders[i];
-            uint256 amount = founderDeposit[founder];
-            if(amount > 0){
-                founderDeposit[founder] = 0;
-                SecuredTokenTransfer.transferToken(usdc, msg.sender, amount);
-                emit MoneyReturnedToFounder(founder, amount);
-            }
-            if(totalDeposited >= objectiveAmount){
-                activeFounderSeason = false;
-            }
-        }
-    }
-
-    function requestRefund() public {
+    //@dev a founder want to get his money back
+    function requestRefund(address safe) public {
         require(
-            activeFounderSeason,
+            activeFounderSeasonBySafe[safe],
             "Project not marked as revert or delete"
         );
         require(
-            founderDeposit[msg.sender] > 0,
+            timeUnlockBySafe[safe] > block.timestamp,
+            "Time to unlock has not passed yet"
+        );
+        require(
+            isLoanPaid(safe),
+            "Loan has not been paid yet"
+        );
+        require(
+            founderDepositsbySafe[safe][msg.sender] > 0,
             "Sender has no deposit"
         );
-        uint256 amount = founderDeposit[msg.sender];
-        totalDeposited -= amount;
-        founderDeposit[msg.sender] = 0;
+        if(!founderHasWithdrawnBySafe[safe]){
+            IPool(aavePool2).withdraw(usdc, type(uint256).max, address(this));
+            founderHasWithdrawnBySafe[safe] = true;
+        }
+
+        uint256 amount = founderDepositsbySafe[safe][msg.sender];
+        totalDepositedBySafe[safe] -= amount;
+        founderDepositsbySafe[safe][msg.sender] = 0;
         SecuredTokenTransfer.transferToken(usdc, msg.sender, amount);
 
-        emit MoneyReturnedToFounder(msg.sender, amount);
+        emit MoneyReturnedToFounder(safe, msg.sender, amount);
     }
 
-    function allowsLoanTo(GnosisSafe safe, address onBehalfOf, address asset, uint256 amount) internal{
+    function allowsLoanTo(address safe, address onBehalfOf, address asset, uint256 amount) internal{
+        GnosisSafe gnosisSafe = GnosisSafe(safe);
         bytes memory data = abi.encodeWithSignature(
             "approveDelegation(address,uint256)",
             onBehalfOf,
             amount
         );
-        require(safe.execTransactionFromModule(aavePool, 0, data, Enum.Operation.Call),
+        require(gnosisSafe.execTransactionFromModule(aavePool, 0, data, Enum.Operation.Call),
                 "Could not execute transaction");
         bytes memory data2 = abi.encodeWithSignature(
             "supply(address,uint256,address,uint16)",
@@ -138,12 +136,42 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
             address(safe),//or this??
             0
         );
-        require(safe.execTransactionFromModule(aavePool,
+        require(gnosisSafe.execTransactionFromModule(aavePool,
                 0,
                 data2,
                 Enum.Operation.Call),
                 "Could not execute transaction");
 
+    }
+    function refoundFounders(address safe) public{
+        require(
+            !activeFounderSeasonBySafe[safe],
+            "Project not marked as revert or delete"
+        );
+
+        uint256 amount = founderDepositsbySafe[safe][msg.sender];
+        founderDepositsbySafe[safe][msg.sender] = 0;
+        SecuredTokenTransfer.transferToken(usdc, msg.sender, amount);
+
+        emit MoneyReturnedToFounder(safe, msg.sender, amount);
+    }
+
+    function isLoanPaid(address safe) public view returns(bool){
+        (
+        uint256 totalCollateralBase,
+        uint256 totalDebtBase,
+        uint256 availableBorrowsBase,
+        uint256 currentLiquidationThreshold,
+        uint256 ltv,
+        uint256 healthFactor
+    ) = IPool(aavePool2).getUserAccountData(address(safe));
+
+        if(totalDebtBase != 0){
+            return false;
+        }else{
+            return true;
+        }
+        
     }
 
 }
