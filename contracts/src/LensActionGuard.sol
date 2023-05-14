@@ -1,3 +1,4 @@
+pragma solidity ^0.8.10;
 import "../lib/safe-contracts/contracts/base/GuardManager.sol";
 import "../lib/safe-contracts/contracts/Safe.sol";
 import "./LensDataTypes.sol";
@@ -65,7 +66,12 @@ contract LensActionGuard is BaseGuard{
     }
     function isValidFunction(bytes4 functionSelector) internal view returns (bool) {
         bytes32 sigHash = keccak256(abi.encodePacked(functionSelector));
-        return profileIdMap[bytesToBytes4(sigHash,0)];
+        bytes memory sigBytes = new bytes(32);
+        assembly {
+            mstore(add(sigBytes, 0x20), sigHash)
+        }
+        bytes4 profileId = bytesToBytes4(sigBytes, 0);
+        return profileIdMap[profileId];
     }
 
     function checkAfterExecution(bytes32 txHash, bool success) external view override {}
