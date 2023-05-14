@@ -35,7 +35,6 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
     address public manager;
     address public usdc = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
     address public aavePool = 0x794a61358D6845594F94dc1DB02A252b5b4814aD;
-    address public aavePool2 = 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2;
 
     //Safe -> Founder -> Amount
     mapping(address => mapping(address => uint256)) public founderDepositsbySafe;
@@ -108,7 +107,7 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
             "Sender has no deposit"
         );
         if(!founderHasWithdrawnBySafe[safe]){
-            IPool(aavePool2).withdraw(usdc, type(uint256).max, address(this));
+            IPool(aavePool).withdraw(usdc, type(uint256).max, address(this));
             founderHasWithdrawnBySafe[safe] = true;
         }
 
@@ -164,7 +163,7 @@ contract FounderTansfersModule is ModuleManager, SignatureDecoder, OwnerManager,
         uint256 currentLiquidationThreshold,
         uint256 ltv,
         uint256 healthFactor
-    ) = IPool(aavePool2).getUserAccountData(address(safe));
+    ) = IPool(aavePool).getUserAccountData(address(safe));
 
         if(totalDebtBase != 0){
             return false;
